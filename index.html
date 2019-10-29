@@ -1,0 +1,933 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<!-- Example version: 1.0 -->
+<head>
+
+	<meta charset="utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<title> Sessions playground </title>
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script
+  src="https://code.jquery.com/jquery-3.4.0.min.js"
+  integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg="
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="css/custom.css">
+	<script src='js/FSHandlebars.js'></script>
+	
+	<script>
+
+        /*
+            Default 
+        */
+		const config =  {
+			storefronts: [
+                "fastspringexamples.test.onfastspring.com/popup-fastspringexamples",
+				"fastspringexamples.test.onfastspring.com"
+			],
+			accessKey: "F27MS9SST4W3UHRNBE1ISA"
+		};
+
+        /*
+            When page is loaded check localStorage to determine whether we are using the 
+            default fastspringexamples storefronts or a custom one from the user
+        */
+
+		const storefrontToUse = localStorage.getItem('storefrontToUse') || config.storefronts[0];
+        let accessKeyToUse = config['accessKey'];
+        if (config.storefronts.indexOf(storefrontToUse) < 0 && localStorage.getItem('accessKeyToUse')) {
+            accessKeyToUse = localStorage.getItem('accessKeyToUse');
+        }
+        
+        document.write(
+            '<scr' + 'ipt ' + `
+                id="fsc-api"
+                src="https://d1f8f9xcsvx3ha.cloudfront.net/sbl/0.8.0/fastspring-builder.min.js" type="text/javascript"
+                data-storefront=${storefrontToUse}
+                data-markup-helpers-callback="markupHelpersCallback"
+                data-before-requests-callback="beforeRequestsCallback"
+                data-after-requests-callback="afterRequestsCallback"
+                data-after-markup-callback="afterMarkupCallback"
+                data-popup-closed="popupClosed"
+                data-decorate-callback="decorateCallback"
+                data-error-callback="errorCallback"
+                data-data-callback="dataCallback"
+                data-access-key=${accessKeyToUse}
+              > ` + 
+            '<\/scr' + 'ipt>'
+        );
+
+	</script>
+</head>
+<body>
+
+    <nav class="navbar flex-md-nowrap p-0 fs-nav">
+        <div class="navbar-brand col-sm-3 col-md-2 mr-0" style="text-align: center;">
+            <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
+        </div>
+        <div class="col-7" style="text-align:center">
+            <span style="">
+                <a href="javascript:window.location.href=window.location.href" target="_blank" style="color: transparent;">
+                    <img src="https://www.fastspringexamples.com/images/fastspringlogo.jpg" alt="homepage" class="fs-logo" style="height: 60px;">
+                </a>
+            </span>
+            <h3 class="header-title">
+                Sessions playground 
+            </h3>
+        </div>
+        <div class="col-2">
+            <span data-toggle="tooltip" data-placement="top" title="How does it work?">
+                <i data-toggle="modal" data-target="#siteInfoModal" class="material-icons customBlue" style='cursor:pointer'>
+                    help
+                </i>
+            </span>
+        </div>
+    </nav>
+    
+<div class="wrapper">
+    <!-- Sidebar -->
+    <nav id="sidenav">
+        
+        <div class='fs-buttons'>
+            
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <a href="#" data-toggle="modal" data-target="#updatePricing" id="customPricing"> Add custom price </a>
+            <a href="#" data-toggle="modal" data-target="#updateCustomerInfo" id="customerInfo"> Add customer information </a>
+            <a href="#" data-toggle="modal" data-target="#addSecurePayload" id="customPayload"> Push secure payload </a>
+            <a href="#" data-toggle="modal" data-target="#updateStorefront"> Change storefront in use </a>
+        </div>
+        <!--
+        <div class='download-container'>
+           <button type="button" class="btn btn-default" data-dismiss="modal"> Download source </button> 
+        </div>
+        -->
+    </nav>
+
+    <!-- Custom Payload Modal --> 
+    <div class="modal fade" id="siteInfoModal" tabindex="-1" role="dialog" aria-labelledby="siteInfoModal" >
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel"> Welcome to the sessions playground! </h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        <br/>
+                        The aim of this tool is to interactively teach some of the methods our javascript library
+                            (<a href="https://docs.fastspring.com/integrating-with-fastspring/store-builder-library/passing-sensitive-data-with-secure-requests" target="_blank">Store Builder Library</a>)  
+                        offers to modify the current cart session.
+                        <br/>
+                        <br/>
+                        What you see on the main page is a display of all the products available in the selected storefront. You can shop around and checkout when you are ready.
+                        <br/>
+                        <br/>
+                        In the top left corner you can see a "burger" icon (&#9776;)
+                        When you click on it, a left side menu opens with the operations you can perform over the session:
+                        <ul>
+                            <li> <b>Add custom price</b>: allows you to override the default price of the chosen product. </li>
+                            <li> <b>Add customer information</b>: allows you to define information about the buyer prior to when the popup checkout displays. </li>
+                            <li> <b>Push secure payload</b>: you can input a whole custom session represented by a JSON object. </li>
+                            <li> <b>Change storefronts</b>: you can choose between the default available storefronts or add your own one. </li>
+                        </ul>
+
+                        <p>
+                            Happy learning! 
+                        </p>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Got it!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- Update Storefront Modal -->
+    <div class="modal fade" id="updateStorefront" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" >
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Change storefront</h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+               </div>
+               <div class="modal-body">
+                   <div class="accordion" id="store-accordion">
+                       <div class="card">
+                           <div class="card-header" id="headingOne">
+                               <h2 class="mb-0">
+                                   <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                       Select available storefronts
+                                   </button>
+                               </h2>
+                           </div>
+                                
+                           <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#store-accordion">
+                               <div class="card-body">
+                                   <form name="storefronts" id="storefronts">
+                                        <!-- Radio inputs will be generated automatically -->
+                                   </form>
+                               </div>
+                           </div>
+                       </div>
+                       <div class="card">
+                           <div class="card-header" id="headingTwo">
+                               <h2 class="mb-0">
+                                   <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                       Add custom storefront
+                                   </button>
+                               </h2>
+                           </div>
+                           <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#store-accordion">
+                               <div class="card-body">
+                                   <form id="popupFormStorefront" name="popupFormStorefront" onsubmit="setCustomStorefront(); return false;" class="needs-validation" novalidate>
+                                       <div class="form-group">
+                                           <label for="storefrontId" class="col-form-label">Storefront Id:</label>
+                                           <input type="text" class="form-control" id="storefrontId" name="storefrontId" required="required"
+                                                                                                                         pattern="^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(\/[a-z0-9-]*)?$"
+                                                                                                                         title="....test.onfastspring.com...">
+                                           <div class="invalid-feedback"> Please insert a valid storefrontId</div>
+                                       </div>
+                                       <div class="form-group">
+                                           <label for="accessKey" class="col-form-label"> Access Key:</label>
+                                           <input class="form-control" type="text" id="accessKey" name="accessKey" pattern=".{22,}" required="required">
+                                           <div class="invalid-feedback"> Please insert a valid 22 characters access key</div>
+                                       </div>
+                                       <button type="submit" class="btn btn-primary" id="addStorefrontBtn"> Add </button>
+                                   </form>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+            </div>
+         </div>
+   </div>
+
+   <!-- Custom Pricing Modal --> 
+   <div class="modal fade" id="updatePricing" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" >
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel"> Custom Pricing </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+               </div>
+               <div class="modal-body">
+                   <form id="popupFormPricing" name="popupFormPricing" onsubmit="return false;" class="needs-validation" novalidate>
+                        <div class="form-row">
+                            <div class="col-md-8 mb-8">
+                                <label for="product" class="col-form-label"> Select product  </label>
+                                <select class="form-control" id="product" name="product" onchange="onPriceChange();"></select>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <label for="customPrice" class="col-form-label"> New unit price  </label>
+                                <input
+                                    value=1
+                                    type="number"
+                                    min="0"
+                                    class="form-control"
+                                    id="customPrice"
+                                    name="customPrice"
+                                    onkeyup="onPriceChange();" onchange="onPriceChange();">
+                            </div>
+                        </div>
+                   </form>
+                   <a class="" data-toggle="collapse" href="#collapsePriceSnippet" role="button" aria-expanded="false" aria-controls="collapseExample">
+                       Code snippet
+                   </a>
+                   <div class="collapse show" id="collapsePriceSnippet">
+                       <div class="card card-body" style="background-color: #8080800d;">
+                           <pre>
+                             <code id="priceSnippet">
+                             </code>
+                           </pre>
+                       </div>
+                   </div>
+               </div>
+               <div class="modal-footer">
+                   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                   <button type="button" class="btn btn-primary" id="UpdatePricingBtn">Update</button>
+               </div>
+            </div>
+         </div>
+   </div>
+
+   <!-- Customer Information Modal --> 
+   <div class="modal fade" id="updateCustomerInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" >
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel"> Customer information </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+               </div>
+               <div class="modal-body">
+                   <p>
+                     You can provide customer information prior to the checkout. This information will be shown or hidden
+                     in the popup checkout depending on the method used.
+                   </p>
+                   <form id="popupFormCustomerInfo" name="popupFormCustomerInfo" onsubmit="addCustomerInfo(); return false;" class="needs-validation" novalidate>
+                       <div class="form-group">
+                           <label for="fname" class="col-form-label"> First name: </label>
+                           <input class="form-control" type="text" id="fname" name="fname" onkeyup="onCustomerInfoChange();">
+                       </div>
+                       <div class="form-group">
+                           <label for="lname" class="col-form-label"> Last name: </label>
+                           <input class="form-control" type="text" id="lname" name="lname" onkeyup="onCustomerInfoChange();">
+                       </div>
+                       <div class="form-group">
+                           <label for="email" class="col-form-label"> Email: </label>
+                           <input class="form-control" type="email" id="email" name="email" onkeyup="onCustomerInfoChange();">
+                       </div>
+                   </form>
+                   <ul class="nav nav-tabs" id='customerTabs' role="tablist">
+                       <li class="nav-item">
+                           <a class="nav-link active" id="recognize" data-toggle="tab" href="#" role="tab" aria-controls="home" aria-selected="true"> Show in checkout </a>
+                       </li>
+                       <li class="nav-item">
+                           <a class="nav-link" id="secure" data-toggle="tab" href="#" role="tab" aria-controls="home" aria-selected="true"> Hide in checkout </a>
+                       </li>
+                   </ul>
+                   <div class="card card-body" style="border-top: 0;background-color: #8080800d;">
+                       <pre>
+                         <code id="customerSnippet">
+                         </code>
+                       </pre>
+                   </div>
+               </div>
+               <div class="modal-footer">
+                   <button type="button" class="btn btn-primary" id="AddCustomerInfoBtn"> Add </button>
+               </div>
+            </div>
+         </div>
+   </div>
+
+   <!-- Custom Payload Modal --> 
+   <div class="modal fade" id="addSecurePayload" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" >
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel"> Custom Secure Payload </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+               </div>
+               <div class="modal-body">
+                   <p>
+                     You can customize every aspect of the session creating a 
+                     <a href="https://docs.fastspring.com/integrating-with-fastspring/store-builder-library/passing-sensitive-data-with-secure-requests" target="_blank"> secure payload</a>.
+                   </p>
+                   <p> This is done using the <a href="https://www.fastspringexamples.com/Methods/secure" target="_blank">secure</a> method of our javascript library. In test mode, you can pass in a raw JSON object representing the session (in production this object needs to be
+                   <a href="https://docs.fastspring.com/integrating-with-fastspring/store-builder-library/passing-sensitive-data-with-secure-requests#PassingSensitiveDatawithSecureRequests-Testingsecurepayloads" target="_blank">encrypted</a>).
+                   </p>
+                   <p> Use the following input to create your custom session payload and press the button to apply it to the session.<p>
+                   </p>
+                   <span class="badge badge-pill badge-info"
+                       id='securePayloadExample'
+                       data-toggle="tooltip"
+                       data-placement="top"
+                       title="Load example payload with one product, customer information and German country"
+                    >
+                        Load example
+                   </span>
+                   <form id="popupFormSecure" name="popupFormSecure" onsubmit="return false;" class="needs-validation" novalidate>
+                        <div class="form-row">
+                            <textarea class="form-control" name="securePayload" rows="10" >{}</textarea>
+                        </div>
+                   </form>
+               </div>
+               <div class="modal-footer">
+                   <button type="button" class="btn btn-primary" id="AddSecurePayloadBtn">Push</button>
+               </div>
+            </div>
+         </div>
+   </div>
+
+
+    <!-- Page Content -->
+    <div id="content">
+        <!-- We'll fill this with dummy content -->
+    <div class="container">
+
+    <div id='error-placeholder' style="display: none;" class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-4"> Storefront error </h1>
+            <p class="lead"> It seems that the storefrontId doesn't exist.</p>
+            <br/>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#updateStorefront">Update</button>
+        </div>
+    </div>
+	<!-- Placeholder for all products - show them in groups, variate between selected and unselected -->
+	<div style="display: none;" data-fsc-items-container='all-products' class='all-products' id="all-products"></div>
+
+	<!-- This template will display all products. It will be rendered and placed to the data-fsc-items-container='all-products' -->
+	<script data-fsc-template-for='all-products' type='text/x-handlebars-template'>
+        <div class='page-header jumbotron jumbotron-fluid'>
+            <p>
+                Welcome! This is the front page of the storefront currently selected. What you see are all the products defined in it. You can shop around
+                and perform operations in the current cart session using the methods available in the left side menu (click &#9776; icon).  
+            </p>
+        </div>
+		<!-- Go through all product groups returned by the API -->
+		{{#each groups}}
+		<!--Is this a top level item?-->
+		{{#iff driverType '==' 'storefront'}}
+		<div class='group'>
+			<!-- display - a group title -->
+			<div class='title'>
+				{{display}}
+			</div>
+			<!-- Go through all items (products) in the group -->
+			{{#each items}}
+			<!-- example of handlebars helper everyother-->
+			{{#everyOther @index 2}}
+			<div class='row highlight'>
+				{{else}}
+				<div class='row highlight'>
+					{{/everyOther}}
+					<div class="col-md-2">
+						<img src='{{image}}' alt='{{display}}' class="img-fluid">
+					</div>
+					<div class="col-md-6">
+						<div class='title'><a href="#{{path}}">{{display}}</a></div>
+						<!-- Check if short description exists and display it if so.  -->
+						{{#if description.summary}}
+						<div class='summary'>{{{description.summary}}}</div>
+						{{/if}}
+						{{#if future}}
+						<!-- "Future" controls subscription terms -->
+						{{/if}}
+						{{#each groups}}
+						<!--"Groups" are item extensions like bundle participants, offers, configuration options and so on. -->
+						{{#iff type '==' 'bundle'}}
+						<div class='bundle'>
+							<div class='well well-sm inline-block'>
+								<!--Show bundle items in well-->
+								{{#each items}}
+								<img src='{{image}}' style="width:60px; height: auto;" alt='{{display}}'>
+								{{/each}}
+							</div>
+						</div>
+						{{/iff}}
+
+						<!-- check if the product has options-->
+						{{#iff type '==' 'options'}}
+						<div class='options'>
+							<div class='title'>{{display}}</div>
+							<div class="well">
+								{{#each items}}
+								<div class='radio inline-block'>
+									<label><input type="radio"{{#if selected}} checked{{/if}} data-fsc-action="Add" data-fsc-item-path-value="{{path}}" onclick="window.location='#{{path}}';"><img src='{{image}}' alt='{{display}}' style="width:40px; height: auto;"> {{{display}}}</label>
+									<span class="optionsprice inline-block current-total-price">{{unitPrice}}</span>
+								</div>
+								<div class="clear"></div>
+								{{/each}}
+							</div>
+						</div>
+						{{/iff}}
+
+						<!--Check if the product has an alternate option-->
+						{{#iff type '==' 'config-one'}}
+						<div class='config-one'>
+							<div class='title'>{{display}}</div>
+							<div class="well">
+								{{#each items}}
+								<div class='radio inline-block'>
+									<label><input type="radio"{{#if selected}} checked{{/if}} data-fsc-action="Add" data-fsc-item-path-value="{{path}}" onclick="window.location='#{{path}}';"><img src='{{image}}' alt='{{display}}' style="width:40px; height: auto;"> {{{display}}}</label>
+									<span class="optionsprice inline-block current-total-price">{{unitPrice}}</span>
+								</div>
+								<div class="clear"></div>
+								{{/each}}
+							</div>
+						</div>
+						{{/iff}}
+
+						<!--Check if product has select many options-->
+						{{#iff type '==' 'config-many'}}
+						<div class='config-many'>
+							<div class='title'>{{display}}</div>
+							<div class="well">
+								{{#each items}}
+								<div class='checkbox inline-block'>
+									{{#if selected}}
+									<label><input type="checkbox" name="{{path}}" checked data-fsc-action="Remove" data-fsc-item-path-value="{{path}}"><img src='{{image}}' alt='{{display}}' style="width:40px; height: auto;"> {{{display}}}</label>
+									{{else}}
+									<label><input type="checkbox" data-fsc-action="Add" data-fsc-item-path-value="{{path}}"><img src='{{image}}' alt='{{display}}' style="width:40px; height: auto;"> {{{display}}}</label>
+									{{/if}}
+									<span class="optionsprice inline-block current-total-price">{{unitPrice}}</span>
+								</div>
+								<div class="clear"></div>
+								{{/each}}
+							</div>
+						</div>
+						{{/iff}}
+
+						<!--Check if subscription has one addon-->
+						{{#iff type '==' 'addon-one'}}
+						<div class='config-one'>
+							<div class='title'>{{display}}</div>
+							<div class="well">
+								{{#each items}}
+								<div class='radio inline-block'>
+									<label><input type="radio"{{#if selected}} checked{{/if}} data-fsc-action="Add" data-fsc-item-path-value="{{path}}" onclick="window.location='#{{path}}';"><img src='{{image}}' alt='{{display}}' style="width:40px; height: auto;"> {{{display}}}</label>
+									<span class="priceWithoutTax">{{priceWithoutTax}}</span>
+									<span class="optionsprice inline-block current-total-price">{{unitPrice}}</span>
+								</div>
+								<div class="clear"></div>
+								{{/each}}
+							</div>
+						</div>
+						{{/iff}}
+
+						<!--Check if subscription has many addons-->
+						{{#iff type '==' 'addon-many'}}
+						<div class='config-many'>
+							<div class='title'>{{display}}</div>
+							<div class="well">
+								{{#each items}}
+								<div class='checkbox inline-block'>
+									{{#if selected}}
+									<label><input type="checkbox" name="{{path}}" checked data-fsc-action="Remove" data-fsc-item-path-value="{{path}}"><img src='{{image}}' alt='{{display}}' style="width:40px; height: auto;"> {{{display}}}</label>
+									{{else}}
+									<label><input type="checkbox" data-fsc-action="Add" data-fsc-item-path-value="{{path}}"><img src='{{image}}' alt='{{display}}' style="width:40px; height: auto;"> {{{display}}}</label>
+									{{/if}}
+									<span class="priceWithoutTax">{{priceWithoutTax}}</span>
+									<span class="optionsprice inline-block current-total-price">{{unitPrice}}</span>
+								</div>
+								<div class="clear"></div>
+								{{/each}}
+							</div>
+						</div>
+						{{/iff}}
+
+						{{/each}}
+					</div>
+					<div class="col-md-2">
+						<!--Call pricing partial from below-->
+						{{>pricing}}
+					</div>
+					<div class="col-md-2">
+						{{#unless selected}}
+						<button class="btn btn-success" data-fsc-action="Add" data-fsc-item-path-value="{{path}}">{{#if description.action}}{{{description.action}}}{{else}}Add to Order{{/if}}</button>
+						{{else}}
+						<!--Call the quantity partial template from below-->
+						{{>quantity}}
+						<!--if product is removable-->
+						{{#if removable}}
+						<div class='remove-from-cart'><button class="btn btn-info" data-fsc-action="Remove" data-fsc-item-path-value="{{path}}">Remove from Cart</button></div>
+						{{/if}}
+						{{/unless}}
+					</div>
+				</div>
+                <!-- <hr /> -->
+				{{/each}}
+			</div>
+			{{/iff}}
+			{{/each}}
+            </br>
+            </br>
+            <div class="row coupon">
+                <div class="col-4">
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <button data-fsc-action="Promocode" value="Apply coupon" class="btn btn-outline-secondary" type="button">Apply coupon: </button>
+                  </div>
+                  <div class="custom-file">
+                    <input type="text" data-fsc-order-promocode data-fsc-promocode-value class="form-control">
+                  </div>
+                </div>
+                </div>
+                <div class="col-12">
+				{{#each order}}
+				{{#if coupons}}
+				<p id="appliedCoupon">
+					{{coupons}}
+				</p>
+				{{else}}
+                <br/>
+				<p> (No coupons applied) </p>
+				{{/if}}
+				{{/each}}
+                </div>
+			</div>
+	</script>
+
+	<!-- Placeholder for a single product display which covers the whole page and only appears when a product title is clicked. -->
+	<div style='display:none' class='full-page' id="one-product" data-fsc-items-container='one-product' data-fsc-filter=""></div>
+
+	<!-- This template will display one product -->
+	<script data-fsc-template-for='one-product' type='text/x-handlebars-template'>
+        <div class='page-header jumbotron jumbotron-fluid'>
+            <p>
+                This is the product page. It offers the full description of the product. At the very button it will display its upsells if contains any.
+            </p>
+        </div>
+		{{#each items}}
+		{{#each items}}
+		<div class='group well'>
+			<div class='row'>
+                <div class="col-12">
+                    <a class="close-icon" href="#">
+                        <i data-toggle="modal" data-target="#siteIssnfoModal" class="material-icons customBlue" style='cursor:pointer; font-size: 32px'>
+                            close
+                        </i>
+                    </a>
+                </div>
+				<div class="col-md-4">
+					<img src="{{image}}" style="float: right; height: auto; width: 100%;" />
+					{{#each groups}}
+					{{#iff type '==' 'bundle'}}
+					<div class='bundle'>
+						<div class='well well-sm inline-block'>
+							{{#each items}}
+							<img src='{{image}}' style="width:60px; height: auto;" alt='{{display}}'>
+							{{/each}}
+						</div>
+					</div>
+					{{/iff}}
+					{{/each}}
+				</div>
+				<div class="col-md-8">
+					<div class='title'>
+						{{display}}
+					</div>
+					<!--Call pricing partial from below-->
+					{{>pricing}}
+					<hr />
+					{{#if description.full}}
+					<div class='summary'>
+						{{{description.full}}}
+					</div>
+					{{/if}}
+					{{#if future}}
+					<!-- "Future" controls subscription terms -->
+					{{/if}}
+					{{#unless selected}}
+					<button class="btn btn-success" data-fsc-action="Add" data-fsc-item-path-value="{{path}}">{{#if description.action}} {{{description.action}}} {{else}} Add to Cart {{/if}}</button>
+					{{else}}
+					<!-- Call the quantity parital from below-->
+					{{>quantity}}
+					{{#if removable}}
+					<div class='remove-from-cart'><button data-fsc-action="Remove" class="btn btn-info" data-fsc-item-path-value="{{path}}"> Remove from cart </button></div>
+					{{/if}}
+					{{/unless}}
+					{{#each groups}}
+					<!--"Groups" are item extensions like bundle participants, offers, configuration options and so on. -->
+					{{#iff type '==' 'options'}}
+					<div class='options'>
+						<div class='title'>{{display}}</div>
+						<div class="well">
+							{{#each items}}
+							<div class='radio inline-block'>
+								<label><input type="radio"{{#if selected}} checked{{/if}} data-fsc-action="Add" data-fsc-item-path-value="{{path}}" onclick="window.location='#{{path}}';"><img src='{{image}}' alt='{{display}}' style="width:40px; height: auto;"> {{{display}}}</label>
+								<span class="optionsprice inline-block"><!--Call pricing partial from below-->{{>pricing}}</span>
+							</div>
+							<div class="clear"></div>
+							{{/each}}
+						</div>
+					</div>
+					{{/iff}}
+
+					{{#iff type '==' 'config-one'}}
+					<div class='config-one'>
+						<div class='title'>{{display}}</div>
+						<div class="well">
+							{{#each items}}
+							<div class='radio inline-block'>
+								<label><input type="radio"{{#if selected}} checked{{/if}} data-fsc-action="Add" data-fsc-item-path-value="{{path}}" onclick="window.location='#{{path}}';"><img src='{{image}}' alt='{{display}}' style="width:40px; height: auto;"> {{{display}}}</label>
+								<span class="optionsprice inline-block"><!--Call pricing partial from below-->{{>pricing}}</span>
+							</div>
+							<div class="clear"></div>
+							{{/each}}
+						</div>
+					</div>
+					{{/iff}}
+
+					{{#iff type '==' 'config-many'}}
+					<div class='config-many'>
+						<div class='title'>{{display}}</div>
+						<div class="well">
+							{{#each items}}
+							<div class='checkbox inline-block'>
+								{{#if selected}}
+								<label><input type="checkbox" name="{{path}}" checked data-fsc-action="Remove" data-fsc-item-path-value="{{path}}"><img src='{{image}}' alt='{{display}}' style="width:40px; height: auto;"> {{{display}}}</label>
+								{{else}}
+								<label><input type="checkbox" data-fsc-action="Add" data-fsc-item-path-value="{{path}}"><img src='{{image}}' alt='{{display}}' style="width:40px; height: auto;"> {{{display}}}</label>
+								{{/if}}
+								<span class="optionsprice inline-block"><!--Call pricing partial from below-->{{>pricing}}</span>
+							</div>
+							<div class="clear"></div>
+							{{/each}}
+						</div>
+					</div>
+					{{/iff}}
+
+					{{#iff type '==' 'replace'}}
+					<div class='replace'>
+                        <h4> Great upsells! </h4>
+						<div class='items'>
+							{{#each items}}
+							<div class='item'>
+								<div class='title'>
+									{{display}}
+								</div>
+								<div class='description'>
+									{{{description.summary}}}
+								</div>
+								<div class='add-to-cart'>
+									<button class="btn btn-success" onclick='addUpsell(this);' data-fsc-item-path-value='{{path}}'> Replace with this product</button>
+								</div>
+							</div>
+							{{/each}}
+						</div>
+					</div>
+					{{/iff}}
+					{{/each}}
+				</div>
+			</div>
+		</div>
+		{{/each}}
+		{{/each}}
+	</script>
+
+
+	<!-- Placeholder for cross-sells and upsells displayed as interstitial. Displayed when URL is "#interstitial" -->
+	<div id="interstitial" data-fsc-items-container='all-offers' id='interstitial' style="display:none;"></div>
+
+	<!-- This template will display all products. It will be rendered and placed to the data-fsc-items-container='all-products' -->
+	<script data-fsc-template-for='all-offers' type='text/x-handlebars-template'>
+        <div class='page-header jumbotron jumbotron-fluid'>
+            <p>
+                This is an interstitial page where <a href="https://docs.fastspring.com/products-bundles-and-subscriptions/product-offers" target="_blank">product offers</a> (up-sells and cross-sells) are shown to the buyer prior to checkout in order to increase revenue.
+            </p>
+        </div>
+		<!-- Go through all product groups returned by the API -->
+		{{#each groups}}
+		{{#iff selectableAdditions '==' true}}
+		<!--Cross-sells-->
+		{{#iff driverType '==' 'product'}}
+		<div class='group well'>
+			<!-- display - a group title -->
+			<div class='title'>
+				{{display}}
+			</div>
+			<!-- Go through all items (products) in the group -->
+			{{#each items}}
+			{{#iff selected '==' false}}
+			<div class='row'>
+				<div class="col-md-2">
+					<img src="{{image}}" style="height: auto; width: 100%;" />
+				</div>
+				<!-- path - product id and URL part. Display - visible product title. -->
+				<div class="col-md-8">
+					<div class='title'>
+						{{display}}
+					</div>
+					{{#if future}}
+					<!-- "Future" controls subscription terms -->
+					{{/if}}
+                </div>
+                <div class="col-md-2">
+					<!--Call pricing partial from below-->
+					{{>pricing}}
+					<button class="btn btn-success" data-fsc-item-path-value='{{path}}' data-fsc-item-path='{{path}}' data-fsc-action='Add, Checkout'> Add cross-sell! </button>
+				</div>
+			</div>
+			<hr />
+			{{/iff}}
+			{{/each}}
+		</div>
+		<hr  />
+		{{/iff}}
+		{{/iff}}
+		{{#each items}}
+		{{#iff selected '==' true}}
+		<!--upsells-->
+		{{#iff selectableReplacements '==' true}}
+		{{#each groups}}
+		{{#iff selectableReplacements '==' true}}
+		<div class='group well'>
+			<!-- display - a group title -->
+			<div class='title'>
+				{{display}}
+			</div>
+			<!-- Go through all items (products) in the group -->
+			{{#each items}}
+			{{#iff selected '==' false}}
+			<div class='row'>
+				<div class="col-md-2">
+					<img src="{{image}}" style="height: auto; width: 100%;" />
+				</div>
+				<!-- path - product id and URL part. Display - visible product title. -->
+				<div class="col-md-6">
+					<div class='title'>
+						{{display}}
+					</div>
+					{{#if future}}
+					<!-- "Future" controls subscription terms -->
+					{{/if}}
+                </div>
+                <div class="col-md-2">
+					<!--Call pricing partial from below-->
+					{{>pricing}}
+                </div>
+                <div class="col-md-2">
+					<button class="btn btn-success" data-fsc-item-path-value='{{path}}' data-fsc-item-path='{{path}}' data-fsc-action='Add, Checkout'>Add up-sell!</button>
+				</div>
+			</div>
+			{{/iff}}
+			{{/each}}
+		</div>
+		{{/iff}}
+		{{/each}}
+		{{/iff}}
+		{{/iff}}
+		{{/each}}
+		{{/each}}
+		<div class='interstitialbuttons'>
+			<button class="btn btn-primary"  onclick="hideInterstitial();"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Continue shopping</button>
+			<button class="btn btn-primary"  data-fsc-action='Checkout'> Ready to checkout! <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span></button>
+		</div>
+	</script>
+
+	<!-- Placeholder for shoppingCart - show all selected items. Will only be displayed if there are items in the cart thanks to the data-fsc-selections-smartdisplay -->
+	<div data-fsc-selections-smartdisplay data-fsc-items-container='shopping-сart' data-fsc-filter="selected=true"></div>
+
+	<!-- Template for shoppingCart - will show all selected items -->
+	<script data-fsc-template-for="shopping-сart" type="text/x-handlebars-template">
+		<div id="shopping-cart" class="shopping-cart">
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-1 column">
+						Your Cart
+					</div>
+					<div class="col-sm-9 column">
+						<div class="well inline-block">
+							{{#each items}}
+							<div>
+								{{#each items}}
+								<div style="float: left; text-align: center;">
+									<a href="#{{path}}"><img src="{{this.image}}" style="height: 60px; width: auto;" /></a>
+									{{#if removable}}
+									<a data-fsc-action="Remove" data-fsc-item-path-value="{{path}}" class="removecart"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+									{{/if}}
+								</div>
+								{{/each}}
+							</div>
+							{{/each}}
+						</div>
+					</div>
+					<div class="col-sm-2 column text-center">
+						<div class="total-price"><span data-fsc-order-total ></span></div>
+						{{#each order}}
+						{{#if discountTotalValue}}
+						<div class="discount">You save {{discountTotal}}!</div>
+						{{/if}}
+						{{/each}}
+						<button id="checkoutDecision" class="btn btn-primary btn-lg" onclick=checkoutDecision()>Checkout</button>
+						<button id="checkout" class="btn btn-primary btn-lg" style="display:none;" data-fsc-action="Checkout">Checkout</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</script>
+
+	<!-- Quantity handlebar partioal -->
+	<script id="quantity-partial" type='text/x-handlebars-template'>
+		<div class='quantity inline-block'>
+			{{#iff pricing.quantity '==' 'allow'}}
+			{{#iff quantity '>=' '10'}}
+				<input type="text" class="form-control" class="inline" data-fsc-item-quantity-value data-fsc-item-path-value="{{path}}" value="{{quantity}}" style="width:50px;">
+				<input type="button" class="btn btn-primary" data-fsc-action="Update" data-fsc-item-path-value="{{path}}" value="Update">
+			</div>
+			<span>{{quantity}} x {{unitPrice}} = {{total}}</span>
+			{{else}}
+			<select data-fsc-item-quantity-value data-fsc-item-quantity data-fsc-item-path-value="{{path}}" data-fsc-item-path="{{path}}" onchange='updatePriceSelector(this);' class="form-control quantity-selector" style="width:50px; display: inline;">
+				<option value='1'>1</option>
+				<option value='2'>2</option>
+				<option value='3'>3</option>
+				<option value='4'>4</option>
+				<option value='5'>5</option>
+				<option value='6'>6</option>
+				<option value='7'>7</option>
+				<option value='8'>8</option>
+				<option value='9'>9</option>
+				<option value='10'>10+</option>
+			</select>
+			{{#iff quantity '>' '1'}}
+			<span> x {{unitPrice}} = {{total}}</span>
+			{{/iff}}
+			{{/iff}}
+			{{/iff}}
+			{{#iff pricing.quantity '==' 'lock'}}
+			<span>{{quantity}}</span>
+			{{/iff}}
+		</div>
+	</script>
+
+	<!-- Pricing handlebar partioal -->
+	<script id="pricing-partial" type='text/x-handlebars-template'>
+		<div class='pricing'>
+			{{#if discountTotalValue}}
+			<div class='original-unit-price'>{{price}}</div>
+			{{/if}}
+			{{#if priceValueWithoutTax}}
+			<div class='pricing-no-tax'>{{priceWithoutTax}}</div>
+			{{/if}}
+			{{#iff totalValue '>' '0'}}
+			<div class='current-total-price'>{{unitPrice}}</div>
+			{{else}}
+			<div class='current-total-price-free'> Free </div>
+			{{/iff}}
+			{{#if discountTotalValue}}
+			<div class='discount'>You save {{discountTotal}} ({{discountPercent}})</div>
+			{{discount.reason}}
+			{{/if}}
+			{{#if discount.data.tiers}}
+			<div class='discount-tiers'>
+				{{#each discount.data.tiers}}
+				<div class='tier'>{{quantity}}+ : {{percent}} off</div>
+				{{/each}}
+			</div>
+			{{/if}}
+		</div>
+	</script>
+
+</div>
+</div>
+
+</div>
+
+<!-- overlay with loading dots before/after requests to server -->
+<div id="overlay">
+	<div id="spinner">
+		<div class="bounce1"></div>
+		<div class="bounce2"></div>
+        <div class="bounce3"></div>
+    </div>
+</div>
+<!-- Dark Overlay element -->
+    <div class="overlay"></div>
+    
+</div>
+<!--
+	Initialize the Store Builder Library
+	Callbacks are located in fullcart.js
+-->
+<script src='js/playground.js'></script>
+
+</body>
+</html>

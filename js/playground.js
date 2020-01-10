@@ -22,7 +22,7 @@
     SOFTWARE.
 
 
-    Sessions playground -by Javier Trujillo
+    Sessions playground - by Javier Trujillo
  */
 
 

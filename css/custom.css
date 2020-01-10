@@ -363,4 +363,8 @@ hr:last-of-type {
     right: 0;
 }
 
+#securePayloadExample {
+    cursor: pointer
+}
+
 
